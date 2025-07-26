@@ -1,6 +1,6 @@
 /*
- * Entry point for the Calendar App.  This file renders the top‑level `App`
- * component into the DOM.  React’s `StrictMode` is enabled to catch
+ * Entry point for the Calendar App.  This file renders the top-level `App`
+ * component into the DOM.  React's `StrictMode` is enabled to catch
  * potential problems during development.  Stylesheets are imported
  * globally here.
  */

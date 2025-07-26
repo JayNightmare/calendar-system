@@ -1,7 +1,7 @@
 /*
  * Main component for the Calendar App.  This file wires together the
  * user interface for creating and viewing events.  It uses
- * react‑big‑calendar for the calendar view and date‑fns for
+ * react-big-calendar for the calendar view and date-fns for
  * localisation.  Events can be added via a modal form, searched,
  * filtered by type and coloured for quick visual differentiation.  A
  * subtle zoom animation plays whenever the user switches between
@@ -15,11 +15,11 @@ import { enGB } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./App.css";
 
-// Define the locales for date‑fns.  Only English (Great Britain) is
+// Define the locales for date-fns.  Only English (Great Britain) is
 // configured here, but other locales can be added easily.
 const locales = { "en-GB": enGB };
 
-// Configure the localiser for react‑big‑calendar using date‑fns.
+// Configure the localiser for react-big-calendar using date-fns.
 const localizer = dateFnsLocalizer({
     format,
     parse,
@@ -69,6 +69,18 @@ const App = () => {
         return [];
     });
 
+    // Dark mode state.  The preference is loaded from localStorage on
+    // initialisation.  When changed, it is saved back and the `dark`
+    // class is toggled on the document body to update CSS variables.
+    const [darkMode, setDarkMode] = useState(() => {
+        const saved = localStorage.getItem("calendarDarkMode");
+        return saved ? JSON.parse(saved) : false;
+    });
+    useEffect(() => {
+        localStorage.setItem("calendarDarkMode", JSON.stringify(darkMode));
+        document.body.classList.toggle("dark", darkMode);
+    }, [darkMode]);
+
     // Persist events to localStorage whenever they change.
     useEffect(() => {
         localStorage.setItem("calendarEvents", JSON.stringify(events));
@@ -91,11 +103,14 @@ const App = () => {
     // Data bound to the event creation form.
     const [formData, setFormData] = useState({
         title: "",
-        type: "reminder",
         description: "",
+        type: "reminder",
         start: "",
         end: "",
     });
+
+    // Selected event for details view when the user clicks on an event.
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     // Compute the filtered events based on search and selected filters.
     const filteredEvents = events.filter((ev) => {
@@ -134,13 +149,19 @@ const App = () => {
         }, 150);
     };
 
+    // When an existing event is clicked in the calendar, show its
+    // details in a modal.
+    const handleSelectEvent = (event) => {
+        setSelectedEvent(event);
+    };
+
     // Called when the user selects a slot on the calendar.  Pre-fills
     // the form with the selected time range and opens the modal.
     const handleSelectSlot = ({ start, end }) => {
         setFormData({
             title: "",
-            type: "reminder",
             description: "",
+            type: "reminder",
             start,
             end,
         });
@@ -167,6 +188,12 @@ const App = () => {
         setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
     };
 
+    // Remove an event from the calendar by its id.
+    const removeEvent = (id) => {
+        setEvents((prev) => prev.filter((ev) => ev.id !== id));
+        setSelectedEvent(null);
+    };
+
     return (
         <div className="app-container">
             <header>
@@ -177,6 +204,13 @@ const App = () => {
                         onClick={() => setShowForm(true)}
                     >
                         Add Event
+                    </button>
+                    <button
+                        className="toggle-mode"
+                        onClick={() => setDarkMode((prev) => !prev)}
+                        title="Toggle dark mode"
+                    >
+                        {darkMode ? "Light mode" : "Dark mode"}
                     </button>
                     <div className="view-switch">
                         <label htmlFor="view-select">View:</label>
@@ -227,7 +261,7 @@ const App = () => {
                     endAccessor="end"
                     style={{
                         height: "75vh",
-                        backgroundColor: "#fff",
+                        backgroundColor: "var(--card-bg)",
                         padding: "8px",
                         borderRadius: "6px",
                         boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
@@ -237,6 +271,7 @@ const App = () => {
                     onView={handleViewChange}
                     selectable
                     onSelectSlot={handleSelectSlot}
+                    onSelectEvent={handleSelectEvent}
                     eventPropGetter={eventStyleGetter}
                 />
             </main>
@@ -263,6 +298,19 @@ const App = () => {
                                 />
                             </label>
                             <label>
+                                Description
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            description: e.target.value,
+                                        })
+                                    }
+                                    rows="3"
+                                ></textarea>
+                            </label>
+                            <label>
                                 Type
                                 <select
                                     value={formData.type}
@@ -279,19 +327,6 @@ const App = () => {
                                         </option>
                                     ))}
                                 </select>
-                            </label>
-                            <label>
-                                Description
-                                <input
-                                    type="text"
-                                    value={formData.description}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            description: e.target.value,
-                                        })
-                                    }
-                                />
                             </label>
                             <label>
                                 Start
@@ -334,6 +369,48 @@ const App = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {selectedEvent && (
+                <div className="modal" onClick={() => setSelectedEvent(null)}>
+                    <div
+                        className="modal-content"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2>Event Details</h2>
+                        <p>
+                            <strong>Title:</strong> {selectedEvent.title}
+                        </p>
+                        <p>
+                            <strong>Type:</strong>{" "}
+                            {eventTypes[selectedEvent.type]?.label ||
+                                selectedEvent.type}
+                        </p>
+                        <p>
+                            <strong>Start:</strong>{" "}
+                            {selectedEvent.start.toLocaleString()}
+                        </p>
+                        <p>
+                            <strong>End:</strong>{" "}
+                            {selectedEvent.end.toLocaleString()}
+                        </p>
+                        <div className="modal-actions">
+                            <button
+                                type="button"
+                                className="secondary"
+                                onClick={() => removeEvent(selectedEvent.id)}
+                            >
+                                Delete
+                            </button>
+                            <button
+                                type="button"
+                                className="primary"
+                                onClick={() => setSelectedEvent(null)}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

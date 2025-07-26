@@ -29,9 +29,10 @@ header h1 {
   margin-bottom: 8px;
 }
 
+/* Primary action button (e.g. Add Event).  Uses the themed primary colour. */
 .controls button.primary {
-  background-color: #6200ea;
-  color: white;
+  background-color: var(--primary-color);
+  color: #ffffff;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -39,25 +40,45 @@ header h1 {
 }
 
 .controls button.primary:hover {
-  background-color: #4b00b5;
+  background-color: var(--primary-hover);
+}
+
+/* Toggle mode button for switching between light and dark themes. */
+.controls button.toggle-mode {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.controls button.toggle-mode:hover {
+  background-color: var(--primary-color);
+  color: #ffffff;
 }
 
 .controls .view-switch label {
   margin-right: 4px;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .controls select {
   padding: 6px 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
   border-radius: 4px;
   font-size: 0.9rem;
 }
 
 .search input {
   padding: 6px 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -73,7 +94,7 @@ header h1 {
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .filter-label input {
@@ -86,7 +107,7 @@ header h1 {
   height: 12px;
   margin-right: 4px;
   border-radius: 2px;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid var(--input-border);
 }
 
 main {
@@ -104,7 +125,7 @@ main.zooming {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: var(--modal-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,11 +133,12 @@ main.zooming {
 }
 
 .modal-content {
-  background: #fff;
+  background: var(--card-bg);
   padding: 20px;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   width: 320px;
+  color: var(--text-color);
 }
 
 .modal-content h2 {
@@ -129,14 +151,16 @@ main.zooming {
   display: block;
   margin-bottom: 8px;
   font-size: 0.85rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .event-form input,
 .event-form select {
   width: 100%;
   padding: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
   border-radius: 4px;
   font-size: 0.9rem;
   margin-top: 4px;
@@ -157,20 +181,21 @@ main.zooming {
   cursor: pointer;
 }
 
+/* Buttons inside the modal actions respect themed colours. */
 .modal-actions button.primary {
-  background-color: #4caf50;
-  color: white;
+  background-color: var(--success-color);
+  color: #ffffff;
 }
 
 .modal-actions button.primary:hover {
-  background-color: #3c8c40;
+  background-color: var(--success-hover);
 }
 
 .modal-actions button.secondary {
-  background-color: #f44336;
-  color: white;
+  background-color: var(--secondary-color);
+  color: #ffffff;
 }
 
 .modal-actions button.secondary:hover {
-  background-color: #cc372e;
+  background-color: var(--secondary-hover);
 }
